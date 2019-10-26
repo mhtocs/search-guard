@@ -21,6 +21,9 @@ stages:
 verify:
   stage: test
   script:
+  - ls -la
+  - id
+  - sudo id   
   - ./smoketest.sh
   - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then mvn -U -Pcoverage verify; else mvn -U verify; fi
   artifacts:

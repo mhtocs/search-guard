@@ -5,8 +5,9 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 
+ls -la
 id
-sudo id
+#sudo id
 pwd
 
 ES_VERSION=7.4.1
