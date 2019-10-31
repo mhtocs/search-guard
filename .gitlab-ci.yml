@@ -1,6 +1,7 @@
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository "
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   SG_JAVA_BUILD_VERSION: "11"
+  SG_TEST_OPENSSL_OPT: "true"
 
 image: circleci/openjdk:${SG_JAVA_BUILD_VERSION}-jdk-browsers
 
@@ -21,6 +22,8 @@ stages:
 verify:
   stage: test
   script:
+  - sudo chown -R circleci ./
+  - ls -la  
   - ./smoketest.sh
   - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then mvn -U -Pcoverage verify; else mvn -U verify; fi
   artifacts:
