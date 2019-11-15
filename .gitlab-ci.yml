@@ -23,7 +23,7 @@ verify:
   stage: test
   script:
   - ./smoketest.sh
-  - if [ "$CI_COMMIT_REF_NAME" == "master" ]; then mvn -U -Pcoverage verify; else mvn -U verify; fi
+  - if [ "$CI_COMMIT_REF_NAME" == "master" ] || [ "$CI_COMMIT_REF_NAME" == "ITT-2360-trigger-kibana-snapshot" ]; then mvn -U -Pcoverage verify; else mvn -U verify; fi
   artifacts:
     reports:
       junit:
@@ -32,7 +32,7 @@ deploy:
   stage: deploy
   only:
     variables:
-      - $CI_COMMIT_REF_NAME == "master"
+      - $CI_COMMIT_REF_NAME == "master" || "$CI_COMMIT_REF_NAME" == "ITT-2360-trigger-kibana-snapshot"
   script:
     - mvn deploy -U -Penterprise -DskipTests -s settings.xml
    #    - mvn -U -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io || true
