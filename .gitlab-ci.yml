@@ -17,6 +17,7 @@ before_script:
 stages:
 - test
 - deploy
+- integrationtest
 
 verify:
   stage: test
@@ -31,9 +32,17 @@ deploy:
   stage: deploy
   only:
     variables:
-    - $CI_COMMIT_REF_NAME == "master"
+      - $CI_COMMIT_REF_NAME == "master"
   script:
-  - mvn deploy -U -Penterprise -DskipTests -s settings.xml
-  #    - mvn -U -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io || true
-  - mvn clean verify com.srcclr:srcclr-maven-plugin:scan -Penterprise -DskipTests -U
-#    -./dev/scan_veracode.sh
+    - mvn deploy -U -Penterprise -DskipTests -s settings.xml
+   #    - mvn -U -Pcoverage sonar:sonar -Dsonar.organization=floragunncom-github -Dsonar.login=$SONAR_LOGIN -Dsonar.host.url=https://sonarcloud.io || true
+    - mvn clean verify com.srcclr:srcclr-maven-plugin:scan -Penterprise -DskipTests -U
+   #    -./dev/scan_veracode.sh
+
+sg_nightly_test:
+  stage: integrationtest
+  script:
+    - "curl --request POST --form variables[NIGHTLY_BUILD]=true --form token=${CI_JOB_TOKEN} --form ref=ITT-2360-trigger-release-testjob https://git.floragunn.com/api/v4/projects/14/trigger/pipeline"
+  only:
+    variables:
+    - $NIGHTLY_BUILD == "true"
