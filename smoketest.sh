@@ -3,6 +3,7 @@ killall -9 java
 shopt -s extglob
 set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo $DIR
 cd $DIR
 
 ES_VERSION=6.8.5
