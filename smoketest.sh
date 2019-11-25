@@ -40,6 +40,8 @@ fi
 rm -f netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar
 echo "Adding elastic user"
 useradd elastic
+mkdir /home/elastic
+chown elastic:elastic /home/elastic -R
 usermod -aG sudo elastic
 sudo -i -u elastic
 
