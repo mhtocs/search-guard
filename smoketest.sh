@@ -41,6 +41,9 @@ rm -f netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar
 
 chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh
 ./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
+useradd elastic
+usermod -aG sudo elastic
+su elastic
 elasticsearch-$ES_VERSION/bin/elasticsearch -Des.insecure.allow.root=true -p es-smoketest-pid &
 
 while ! nc -z 127.0.0.1 9200; do
