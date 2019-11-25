@@ -11,8 +11,8 @@ NETTY_NATIVE_VERSION=2.0.7.Final
 NETTY_NATIVE_CLASSIFIER=non-fedora-linux-x86_64
 
 rm -rf elasticsearch-$ES_VERSION
-sudo wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.tar.gz
-sudo chmod 777 elasticsearch-$ES_VERSION.tar.gz
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.tar.gz
+chmod 777 elasticsearch-$ES_VERSION.tar.gz
 pwd
 echo "This dir"
 ls -l
