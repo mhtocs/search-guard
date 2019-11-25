@@ -43,9 +43,9 @@ useradd elastic
 mkdir /home/elastic
 chown elastic:elastic /home/elastic -R
 usermod -aG sudo elastic
-sudo su elastic
-sudo -i elastic
-sudo -s elastic
+#sudo su elastic
+#sudo -i elastic
+#sudo -s elastic
 su elastic
 whoami
 
