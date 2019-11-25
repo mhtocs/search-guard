@@ -10,7 +10,7 @@ cache:
   - .m2/repository
 
 before_script:
-- sudo rm -rf /var/lib/apt/lists/* && sudo apt-get update -yqq && sudo apt-get install -yqq libapr1 openssl libxml2-utils tar
+- sudo apt-get install -yqq libapr1 openssl libxml2-utils tar
 - echo "VERSIONS:"
 - uname -a;java -version;openssl version
 
