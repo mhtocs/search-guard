@@ -44,6 +44,7 @@ mkdir /home/elastic
 chown elastic:elastic /home/elastic -R
 usermod -aG sudo elastic
 sudo -i -u elastic
+whoami
 
 
 echo "Plugin installation"
