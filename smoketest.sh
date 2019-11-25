@@ -44,7 +44,7 @@ chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_con
 useradd elastic
 usermod -aG sudo elastic
 su elastic
-elasticsearch-$ES_VERSION/bin/elasticsearch -Des.insecure.allow.root=true -p es-smoketest-pid &
+elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
 
 while ! nc -z 127.0.0.1 9200; do
   sleep 0.1 # wait for 1/10 of the second before check again
