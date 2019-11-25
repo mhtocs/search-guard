@@ -41,8 +41,8 @@ rm -f netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar
 echo "Adding elastic user"
 useradd elastic
 usermod -aG sudo elastic
-su elastic
-whoami
+sudo -i -u elastic
+
 
 echo "Plugin installation"
 

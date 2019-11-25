@@ -10,7 +10,7 @@ cache:
   - .m2/repository
 
 before_script:
-- rm -rf /var/lib/apt/lists/* && apt-get update -yqq && apt-get install -yqq apt-utils jq perl libapr1 openssl libxml2-utils curl uuid-runtime ftp gnupg2 netcat pinentry-tty expect psmisc xmlstarlet
+- rm -rf /var/lib/apt/lists/* && apt-get update -yqq && apt-get install -yqq apt-utils jq perl libapr1 openssl libxml2-utils curl uuid-runtime ftp gnupg2 netcat pinentry-tty expect psmisc xmlstarlet sudo
 - echo "VERSIONS:"
 - uname -a;java -version;openssl version
 
