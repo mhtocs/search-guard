@@ -13,7 +13,11 @@ NETTY_NATIVE_CLASSIFIER=non-fedora-linux-x86_64
 rm -rf elasticsearch-$ES_VERSION
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-$ES_VERSION.tar.gz
 pwd
-tar -xzf --no-same-owner elasticsearch-$ES_VERSION.tar.gz
+echo "This dir"
+ls -l
+echo "Up dir"
+ls -l ../
+sudo tar -xzf elasticsearch-$ES_VERSION.tar.gz
 rm -rf elasticsearch-$ES_VERSION.tar.gz
 #wget -O netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar https://search.maven.org/remotecontent?filepath=io/netty/netty-tcnative/$NETTY_NATIVE_VERSION/netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar
 mvn clean package -Penterprise -DskipTests
