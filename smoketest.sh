@@ -38,12 +38,18 @@ fi
 
 #cp netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar elasticsearch-$ES_VERSION/plugins/search-guard-ssl/
 rm -f netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar
-
-chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh
-./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
+echo "Adding elastic user"
 useradd elastic
 usermod -aG sudo elastic
 su elastic
+whoami
+
+echo "Plugin installation"
+
+chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh
+./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
+
+echo "ES starting up"
 elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
 
 while ! nc -z 127.0.0.1 9200; do
