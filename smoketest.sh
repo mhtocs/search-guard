@@ -43,7 +43,7 @@ useradd elastic
 mkdir /home/elastic
 chown elastic:elastic /home/elastic -R
 usermod -aG sudo elastic
-sudo -i -u elastic
+sudo su elastic
 whoami
 
 
