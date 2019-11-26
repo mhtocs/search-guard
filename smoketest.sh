@@ -36,9 +36,8 @@ echo "Adding elastic user"
 useradd elastic
 mkdir /home/elastic
 chown elastic:elastic /home/elastic -R
+chown elastic:elastic $DIR/elasticsearch-$ES_VERSION -R
 usermod -aG sudo elastic
-whoami
-
 
 
 echo "Plugin installation"
