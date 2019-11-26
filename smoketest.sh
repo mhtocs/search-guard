@@ -32,13 +32,14 @@ fi
 
 #cp netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar elasticsearch-$ES_VERSION/plugins/search-guard-ssl/
 rm -f netty-tcnative-$NETTY_NATIVE_VERSION-$NETTY_NATIVE_CLASSIFIER.jar
-echo "Adding elastic user"
-useradd elastic
-mkdir /home/elastic
-chown elastic:elastic /home/elastic -R
-chown elastic:elastic $DIR/elasticsearch-$ES_VERSION -R
-usermod -aG sudo elastic
-
+if [ "$CI" == "true" ]; then
+  echo "Adding esuser user"
+  useradd esuser
+  mkdir /home/esuser
+  chown esuser:esuser /home/esuser -R
+  chown esuser:esuser $DIR/elasticsearch-$ES_VERSION -R
+  usermod -aG sudo esuser
+fi
 
 echo "Plugin installation"
 
@@ -46,7 +47,7 @@ chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_con
 ./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
 
 echo "ES starting up"
-sudo -E -u elastic elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
+sudo -E -u esuser elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
 
 while ! nc -z 127.0.0.1 9200; do
   sleep 0.1 # wait for 1/10 of the second before check again
