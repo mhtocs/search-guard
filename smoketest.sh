@@ -42,6 +42,7 @@ whoami
 echo "Set Java Home"
 JAVA_HOME=`which java`
 echo "JAVA_HOME is $JAVA_HOME"
+export $JAVA_HOME
 
 echo "Plugin installation"
 
