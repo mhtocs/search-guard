@@ -39,12 +39,7 @@ chown elastic:elastic /home/elastic -R
 usermod -aG sudo elastic
 whoami
 
-echo "Set Java Home"
-echo $JAVA_HOME
-JAVA_HOME=`java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home'|cut -d'=' -f2|cut -d' ' -f2`
-ls -l $JAVA_HOME
-echo "JAVA_HOME is $JAVA_HOME"
-export JAVA_HOME=$JAVA_HOME
+
 
 echo "Plugin installation"
 
@@ -52,7 +47,7 @@ chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_con
 ./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
 
 echo "ES starting up"
-sudo -u elastic elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
+sudo -E -u elastic export JAVA_HOME=$JAVA_HOME;elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
 
 while ! nc -z 127.0.0.1 9200; do
   sleep 0.1 # wait for 1/10 of the second before check again
