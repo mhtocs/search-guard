@@ -40,7 +40,7 @@ usermod -aG sudo elastic
 whoami
 
 echo "Set Java Home"
-JAVA_HOME=`which java`
+JAVA_HOME="/usr/local/openjdk-${SG_JAVA_BUILD_VERSION}"
 echo "JAVA_HOME is $JAVA_HOME"
 export JAVA_HOME=$JAVA_HOME
 
