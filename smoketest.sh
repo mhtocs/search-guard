@@ -47,7 +47,7 @@ chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_con
 ./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
 
 echo "ES starting up"
-sudo -E -u elastic export JAVA_HOME=$JAVA_HOME;elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
+sudo -E -u elastic elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
 
 while ! nc -z 127.0.0.1 9200; do
   sleep 0.1 # wait for 1/10 of the second before check again
