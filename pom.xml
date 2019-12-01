@@ -34,7 +34,7 @@
   </licenses>
 
   <properties>
-    <sgssl.version>6.8.5-25.7-SNAPSHOT</sgssl.version>
+    <sgssl.version>6.8.5-25.7</sgssl.version>
     <enterprise-modules.version>6.8.5-34.5-SNAPSHOT</enterprise-modules.version>
     <elasticsearch.version>6.8.5</elasticsearch.version>
     
