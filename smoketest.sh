@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo $DIR
 cd $DIR
 
-ES_VERSION=6.8.5
+ES_VERSION=6.8.6
 NETTY_NATIVE_VERSION=2.0.7.Final
 NETTY_NATIVE_CLASSIFIER=non-fedora-linux-x86_64
 
@@ -47,7 +47,12 @@ chmod +x elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_con
 ./elasticsearch-$ES_VERSION/plugins/search-guard-6/tools/install_demo_configuration.sh -y -i
 
 echo "ES starting up"
-sudo -E -u esuser elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
+if [ "$CI" == "true" ]; then
+    sudo -E -u esuser elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
+else
+    elasticsearch-$ES_VERSION/bin/elasticsearch -p es-smoketest-pid &
+fi
+
 
 while ! nc -z 127.0.0.1 9200; do
   sleep 0.1 # wait for 1/10 of the second before check again
