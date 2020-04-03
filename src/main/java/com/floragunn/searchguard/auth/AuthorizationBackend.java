@@ -62,4 +62,10 @@ public interface AuthorizationBackend {
      */
     void fillRoles(User user, AuthCredentials credentials) throws ElasticsearchSecurityException;
 
+    /**
+     * Checks whether to skip the authorization for the given user
+     * @param userName The user name for whom the authorization shall be skipped
+     * @return return true if the authorization shall be skipped otherwise false
+     */
+    boolean isAuthorizationSkipped(String userName);
 }

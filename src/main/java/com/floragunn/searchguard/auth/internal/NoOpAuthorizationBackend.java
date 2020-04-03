@@ -41,4 +41,9 @@ public class NoOpAuthorizationBackend implements AuthorizationBackend {
         // no-op
     }
 
+    @Override
+    public boolean isAuthorizationSkipped(String userName) {
+        return false;
+    }
+
 }

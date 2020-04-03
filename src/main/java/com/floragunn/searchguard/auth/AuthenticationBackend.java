@@ -54,7 +54,7 @@ public interface AuthenticationBackend {
      * <p/>
      * Results of this method are normally cached so that we not need to query the backend for every authentication attempt.
      * <p/> 
-     * @param The credentials to be validated, never null
+     * @param credentials to be validated, never null
      * @return the authenticated User, never null
      * @throws ElasticsearchSecurityException in case an authentication failure 
      * (when credentials are incorrect, the user does not exist or the backend is not reachable)
@@ -71,4 +71,10 @@ public interface AuthenticationBackend {
      */
     boolean exists(User user);
 
+    /**
+     * Checks whether the authentication for a given user shall be skipped
+     * @param username The username for whom the authentication shall be skipped.
+     * @return true if the authentication shall be skipped otherwise false
+     */
+    boolean isAuthenticationSkipped(String username);
 }

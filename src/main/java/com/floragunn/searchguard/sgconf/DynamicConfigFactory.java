@@ -63,7 +63,7 @@ public class DynamicConfigFactory implements Initializable, ConfigurationChangeL
         staticTenants = SgDynamicConfiguration.fromNode(staticTenantsJsonNode, CType.TENANTS, 2, 0, 0);
     }
     
-    public final static SgDynamicConfiguration<?> addStatics(SgDynamicConfiguration<?> original) {
+    public static SgDynamicConfiguration<?> addStatics(SgDynamicConfiguration<?> original) {
         if(original.getCType() == CType.ACTIONGROUPS && !staticActionGroups.getCEntries().isEmpty()) {
             original.add(staticActionGroups.deepClone());
         }
@@ -85,7 +85,7 @@ public class DynamicConfigFactory implements Initializable, ConfigurationChangeL
     private final List<DCFListener> listeners = new ArrayList<>();
     private final Settings esSettings;
     private final Path configPath;
-    private final InternalAuthenticationBackend iab = new InternalAuthenticationBackend();
+    private final InternalAuthenticationBackend iab;
 
     SgDynamicConfiguration<?> config;
     
@@ -105,7 +105,9 @@ public class DynamicConfigFactory implements Initializable, ConfigurationChangeL
         } else {
             log.info("Static resources will not be loaded.");
         }
-        
+
+        this.iab = new InternalAuthenticationBackend(esSettings);
+
         registerDCFListener(this.iab);
         this.cr.subscribeOnChange(this);
     }

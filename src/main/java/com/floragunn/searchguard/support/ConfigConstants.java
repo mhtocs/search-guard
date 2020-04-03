@@ -200,7 +200,9 @@ public class ConfigConstants {
     public static final String SEARCHGUARD_SSL_ONLY = "searchguard.ssl_only";
     
     public static final String SEARCHGUARD_DISABLE_ENVVAR_REPLACEMENT = "searchguard.disable_envvar_replacement";
-    
+
+    public static final String SKIP_USERS = "skip_users";
+
     public enum RolesMappingResolution {
         MAPPING_ONLY,
         BACKENDROLES_ONLY,

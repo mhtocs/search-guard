@@ -19,7 +19,6 @@ package com.floragunn.searchguard.auth;
 
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -329,7 +328,7 @@ public class BackendRegistry implements DCFListener {
      */
     public boolean authenticate(final RestRequest request, final RestChannel channel, final ThreadContext threadContext) {
 
-        if (request.getHttpChannel().getRemoteAddress() instanceof InetSocketAddress && isBlocked(((InetSocketAddress) request.getHttpChannel().getRemoteAddress()).getAddress())) {
+        if (request.getHttpChannel().getRemoteAddress() != null && isBlocked(request.getHttpChannel().getRemoteAddress().getAddress())) {
             if (log.isDebugEnabled()) {
                 log.debug("Rejecting REST request because of blocked address: " + request.getHttpChannel().getRemoteAddress());
             }
@@ -339,7 +338,7 @@ public class BackendRegistry implements DCFListener {
             return false;
         }
 
-        final String sslPrincipal = (String) threadPool.getThreadContext().getTransient(ConfigConstants.SG_SSL_PRINCIPAL);
+        final String sslPrincipal = threadPool.getThreadContext().getTransient(ConfigConstants.SG_SSL_PRINCIPAL);
 
         if (adminDns.isAdminDN(sslPrincipal)) {
             //PKI authenticated REST call
@@ -429,6 +428,12 @@ public class BackendRegistry implements DCFListener {
                 }
             } else {
                 org.apache.logging.log4j.ThreadContext.put("user", ac.getUsername());
+
+                if(authDomain.getBackend().isAuthenticationSkipped(ac.getUsername())) {
+                    log.trace("Skipping authentication for {}", ac.getUsername());
+                    continue;
+                }
+
                 if (!ac.isComplete()) {
                     //credentials found in request but we need another client challenge
                     if (httpAuthenticator.reRequestAuthentication(channel, ac)) {
@@ -447,12 +452,13 @@ public class BackendRegistry implements DCFListener {
 
             if (authenticatedUser == null) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Cannot authenticate rest user {} (or add roles) with authdomain {}/{} of {}, try next", ac.getUsername(), authDomain.getBackend().getType(), authDomain.getOrder(), restAuthDomains);
+                    log.debug("Cannot authenticate rest user {} (or add roles) with authdomain {}/{} of {}, try next",
+                            ac.getUsername(), authDomain.getBackend().getType(), authDomain.getOrder(), restAuthDomains);
                 }
 
                 for (AuthFailureListener authFailureListener : this.authBackendFailureListeners.get(authDomain.getBackend().getClass().getName())) {
                     authFailureListener.onAuthFailure(
-                            (request.getHttpChannel().getRemoteAddress() instanceof InetSocketAddress) ? ((InetSocketAddress) request.getHttpChannel().getRemoteAddress()).getAddress()
+                            (request.getHttpChannel().getRemoteAddress() != null) ? request.getHttpChannel().getRemoteAddress().getAddress()
                                     : null,
                             ac, request);
                 }
@@ -528,12 +534,12 @@ public class BackendRegistry implements DCFListener {
             return false;
         }
 
-        return authenticated;
+        return true;
     }
 
     private void notifyIpAuthFailureListeners(RestRequest request, AuthCredentials authCredentials) {
         notifyIpAuthFailureListeners(
-                (request.getHttpChannel().getRemoteAddress() instanceof InetSocketAddress) ? ((InetSocketAddress) request.getHttpChannel().getRemoteAddress()).getAddress() : null,
+                (request.getHttpChannel().getRemoteAddress() != null) ? request.getHttpChannel().getRemoteAddress().getAddress() : null,
                 authCredentials, request);
     }
 
@@ -609,7 +615,11 @@ public class BackendRegistry implements DCFListener {
                 if (log.isTraceEnabled()) {
                     log.trace("Backend roles for " + authenticatedUser.getName() + " not cached, return from " + ab.getType() + " backend directly");
                 }
-                ab.fillRoles(authenticatedUser, new AuthCredentials(authenticatedUser.getName()));
+                if (ab.isAuthorizationSkipped(authenticatedUser.getName())) {
+                    log.trace("Skipping retrieving roles for {}", authenticatedUser.getName());
+                } else {
+                    ab.fillRoles(authenticatedUser, new AuthCredentials(authenticatedUser.getName()));
+                }
             } catch (Exception e) {
                 log.error("Cannot retrieve roles for {} from {} due to {}", authenticatedUser, ab.getType(), e.toString(), e);
             }
@@ -642,18 +652,15 @@ public class BackendRegistry implements DCFListener {
                 return authBackend.authenticate(ac);
             }
 
-            return cache.get(ac, new Callable<User>() {
-                @Override
-                public User call() throws Exception {
-                    if (log.isTraceEnabled()) {
-                        log.trace("Credentials for user " + ac.getUsername() + " not cached, return from " + authBackend.getType()
-                                + " backend directly");
-                    }
-                    final User authenticatedUser = authBackend.authenticate(ac);
-                    authz(authenticatedUser, roleCache, authorizers);
-
-                    return authenticatedUser;
+            return cache.get(ac, () -> {
+                if (log.isTraceEnabled()) {
+                    log.trace("Credentials for user " + ac.getUsername() + " not cached, return from " + authBackend.getType()
+                            + " backend directly");
                 }
+                final User authenticatedUser = authBackend.authenticate(ac);
+                authz(authenticatedUser, roleCache, authorizers);
+
+                return authenticatedUser;
             });
         } catch (Exception e) {
             if (log.isDebugEnabled()) {

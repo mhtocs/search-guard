@@ -20,12 +20,11 @@ package com.floragunn.searchguard.auth.internal;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import com.floragunn.searchguard.support.ConfigConstants;
+import com.floragunn.searchguard.support.WildcardMatcher;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.elasticsearch.ElasticsearchSecurityException;
 
@@ -37,10 +36,17 @@ import com.floragunn.searchguard.sgconf.DynamicConfigModel;
 import com.floragunn.searchguard.sgconf.InternalUsersModel;
 import com.floragunn.searchguard.user.AuthCredentials;
 import com.floragunn.searchguard.user.User;
+import org.elasticsearch.common.settings.Settings;
 
 public class InternalAuthenticationBackend implements AuthenticationBackend, AuthorizationBackend, DCFListener {
 
     private InternalUsersModel internalUsersModel;
+
+    private final Settings settings;
+
+    public InternalAuthenticationBackend(Settings settings) {
+        this.settings = settings;
+    }
 
     @Override
     public boolean exists(User user) {
@@ -75,12 +81,18 @@ public class InternalAuthenticationBackend implements AuthenticationBackend, Aut
 
         return false;
     }
-    
+
+    @Override
+    public boolean isAuthenticationSkipped(String userName) {
+        final List<String> skipUsers = settings.getAsList(ConfigConstants.SKIP_USERS, Collections.emptyList());
+        return !skipUsers.isEmpty() && (WildcardMatcher.matchAny(skipUsers, userName));
+    }
+
     @Override
     public User authenticate(final AuthCredentials credentials) {
 
         if (internalUsersModel == null) {
-            throw new ElasticsearchSecurityException("Internal authentication backend not configured. May be Search Guard is not initialized. See https://docs.search-guard.com/latest/sgadmin");
+            throw new ElasticsearchSecurityException("Internal authentication backend not configured. Maybe Search Guard is not initialized. See https://docs.search-guard.com/latest/sgadmin");
         }
                 
         if(!internalUsersModel.exists(credentials.getUsername())) {
@@ -143,12 +155,18 @@ public class InternalAuthenticationBackend implements AuthenticationBackend, Aut
 
         if(exists(user)) {
             final List<String> roles = internalUsersModel.getBackenRoles(user.getName());
-            if(roles != null && !roles.isEmpty() && user != null) {
+            if(roles != null && !roles.isEmpty()) {
                 user.addRoles(roles);
             }
         }
         
         
+    }
+
+    @Override
+    public boolean isAuthorizationSkipped(String userName) {
+        final List<String> skipUsers = settings.getAsList(ConfigConstants.SKIP_USERS, Collections.emptyList());
+        return !skipUsers.isEmpty() && (WildcardMatcher.matchAny(skipUsers, userName));
     }
 
     @Override

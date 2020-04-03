@@ -46,4 +46,9 @@ public class NoOpAuthenticationBackend implements AuthenticationBackend {
         return true;
     }
 
+    @Override
+    public boolean isAuthenticationSkipped(String username) {
+        return false;
+    }
+
 }
