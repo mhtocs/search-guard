@@ -34,7 +34,7 @@
   </licenses>
 
   <properties>
-    <sgssl.version>6.8.8-25.7</sgssl.version>
+    <sgssl.version>6.8.8-25.7-SNAPSHOT</sgssl.version>
     <enterprise-modules.version>6.8.8-34.5-SNAPSHOT</enterprise-modules.version>
     <elasticsearch.version>6.8.8</elasticsearch.version>
     
@@ -65,19 +65,6 @@
     <system>GitHub</system>
     <url>https://github.com/floragunncom/search-guard/issues</url>
   </issueManagement>
-
-   <repositories>
-      <repository>
-         <id>elasticsearch-releases</id>
-         <url>https://artifacts.elastic.co/maven</url>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-         <snapshots>
-            <enabled>false</enabled>
-         </snapshots>
-      </repository>
-   </repositories>
 
   <dependencies>
     <!-- Search Guard SSL -->
