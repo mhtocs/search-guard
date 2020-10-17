@@ -105,6 +105,7 @@ import com.floragunn.searchguard.ssl.util.SSLConfigConstants;
 import com.floragunn.searchguard.support.ConfigConstants;
 import com.floragunn.searchguard.support.SearchGuardDeprecationHandler;
 import com.floragunn.searchguard.support.SgUtils;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 
 public class SearchGuardAdmin {
@@ -213,6 +214,8 @@ public class SearchGuardAdmin {
         options.addOption(Option.builder("er").longOpt("explicit-replicas").hasArg().argName("number of replicas").desc("Set explicit number of replicas or autoexpand expression for searchguard index").build());
 
         options.addOption(Option.builder("rev").longOpt("resolve-env-vars").desc("Resolve/Substitute env vars in config with their value before uploading").build());
+        
+        options.addOption(Option.builder("setrw").longOpt("set-sg-index-to-read-write").desc("Set \"index.blocks.read_only_allow_delete\": false on the Search Guard index").build());
 
         
         //when adding new options also adjust validate(CommandLine line)
@@ -259,6 +262,7 @@ public class SearchGuardAdmin {
         final boolean promptForPassword;
         String explicitReplicas = null;
         final boolean resolveEnvVars;
+        boolean setIndexToReadwrite;
         
         CommandLineParser parser = new DefaultParser();
         try {
@@ -344,6 +348,8 @@ public class SearchGuardAdmin {
             explicitReplicas = line.getOptionValue("er", explicitReplicas);
             
             resolveEnvVars = line.hasOption("rev");
+            
+            setIndexToReadwrite = line.hasOption("setrw");
             
         }
         catch( ParseException exp ) {
@@ -483,6 +489,11 @@ public class SearchGuardAdmin {
                     return (-1);
                 }
 
+            }
+            
+            if (setIndexToReadwrite) {
+                makeSgIndexReadWrite(tc, index);
+                return 0;
             }
 
             if(updateSettings != null) { 
@@ -762,6 +773,12 @@ public class SearchGuardAdmin {
         }
         // TODO audit changes to searchguard index
     }
+    
+    private static void makeSgIndexReadWrite(Client client, String index) {
+        AcknowledgedResponse response = client.admin().indices().updateSettings(new UpdateSettingsRequest(index).settings(ImmutableMap.of("index.blocks.read_only_allow_delete", "false"))).actionGet();
+        
+        System.out.println("Index settings acknowledged: " + response.isAcknowledged());
+    }
 
     private static boolean checkConfigUpdateResponse(ConfigUpdateResponse response, NodesInfoResponse nir, int expectedConfigCount) {
         
@@ -811,7 +828,7 @@ public class SearchGuardAdmin {
         
         System.out.println("Will update '"+type+"/" + id + "' with " + filepath+" "+(legacy?"(legacy mode)":""));
 
-        try {
+        try {            
             final String content = Files.asCharSource(new File(filepath), StandardCharsets.UTF_8).read();
             final String res = tc
                     .index(new IndexRequest(index).type(type).id(id).setRefreshPolicy(RefreshPolicy.IMMEDIATE)
