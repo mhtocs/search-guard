@@ -53,6 +53,7 @@ import org.elasticsearch.action.bulk.BulkItemRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkShardRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.fieldcaps.FieldCapabilitiesIndexRequest;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.MultiGetRequest;
@@ -789,7 +790,21 @@ public final class IndexResolverReplacer implements ConfigurationChangeListener 
             for (DocWriteRequest ar : ((BulkRequest) request).requests()) {
                 result = getOrReplaceAllIndices(ar, provider, false) && result;
             }
+        } else if (request instanceof FieldCapabilitiesIndexRequest) {
+            FieldCapabilitiesIndexRequest fieldCapabilitiesRequest = (FieldCapabilitiesIndexRequest) request;
 
+            String index = fieldCapabilitiesRequest.index();
+
+            String[] newIndices = provider.provide(new String [] {index}, request, false);
+            if(!checkIndices(request, newIndices, true, allowEmptyIndices)) {
+                return false;
+            }
+            
+            // FieldCapabilitiesIndexRequest does not support replacing the indexes.
+            // However, the indexes are always determined by FieldCapabilitiesRequest which will be reduced below
+            // (implements Replaceable). So IF an index arrives here, we can be sure that we have
+            // at least privileges for indices:data/read/field_caps
+            
         } else if (request instanceof MultiGetRequest) {
 
             for (ListIterator<Item> it = ((MultiGetRequest) request).getItems().listIterator(); it.hasNext();){
