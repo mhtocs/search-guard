@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo $DIR
 cd $DIR
 
-ES_VERSION=6.8.17
+ES_VERSION=6.8.21
 NETTY_NATIVE_VERSION=2.0.7.Final
 NETTY_NATIVE_CLASSIFIER=non-fedora-linux-x86_64
 
